@@ -7,12 +7,31 @@
 [Ll]ogs/
 [Mm]emoryCaptures/
 UserSettings/
+sysinfo.txt
+*.pidb
+*.booproj
+*.suo
+*.user
+*.userprefs
 
-# IDE
-.vscode/
+# Unity generated project files (IDE)
+*.csproj
+*.unityproj
+*.sln
+
+# Asset Store tools cache
+Assets/AssetStoreTools*
+
+# Visual Studio / Rider / VSCode / IDE
 .vs/
+.vscode/
 .idea/
 
 # OS
 .DS_Store
 Thumbs.db
+
+# Editor swap / crash / lock files
+*.swp
+*.lock
+*.log
