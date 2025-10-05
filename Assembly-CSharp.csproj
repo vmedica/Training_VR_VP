@@ -67,6 +67,7 @@
     <Compile Include="Assets\@PaulosCreations\RunesAndPortals\PortalGate\Scripts\PortalGate_Controller.cs" />
     <Compile Include="Assets\_Project\Scripts\Interaction\DoctorTips.cs" />
     <Compile Include="Assets\_Project\Scripts\Interaction\LevaPortaleTrigger.cs" />
+    <Compile Include="Assets\_Project\Scripts\Interaction\VirtualPatientManager.cs" />
     <Compile Include="Assets\@PaulosCreations\RunesAndPortals\PortalRound\Script\PortalRound_Controller.cs" />
     <Compile Include="Assets\SimpleLever.cs" />
     <Compile Include="Assets\_Project\Scripts\Player\PazienteMovimento.cs" />
