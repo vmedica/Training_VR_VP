@@ -1,4 +1,4 @@
-using System;
+/*using System;
 
 public class PatientManager : MonoBehaviour{
     [SerializeField] private string datasetPath = "C:\Training_VR_VP\Assets\_Project\Resources\Dataset\Clean_filteredDataset.csv"
@@ -15,4 +15,4 @@ public class PatientManager : MonoBehaviour{
         Debug.Log("LLM: " + response);
     }
     CONTINUA DA QUI...
-}   
+}   */

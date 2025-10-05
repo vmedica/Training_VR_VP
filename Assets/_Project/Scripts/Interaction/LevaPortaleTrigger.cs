@@ -6,6 +6,9 @@ public class LevaPortaleTrigger : MonoBehaviour
     [SerializeField] private GameObject portalPrefab;
     [SerializeField] private Transform spawnPoint;
 
+    [Header("Script collegato a LM Studio")]
+    [SerializeField] private VirtualPatientManager virtualPatientManager;
+
     [Header("Script spawn paziente")]
     [SerializeField] private SpawnPaziente spawnPazienteScript;
 
@@ -51,6 +54,11 @@ public class LevaPortaleTrigger : MonoBehaviour
             if (spawnPazienteScript != null)
             {
                 spawnPazienteScript.AttivaPortale();
+            }
+
+            //Avvia paziente virtuale (LLM)
+            if(virtualPatientManager != null){
+                virtualPatientManager.CreaPazineteVirtuale();
             }
 
             // Stato aggiornato

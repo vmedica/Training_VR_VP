@@ -56,6 +56,7 @@
     <Compile Include="Assets\DenysAlmaral\CityPeople-FREE\Demo_Scenes\Scripts\DemoCamera.cs" />
     <Compile Include="Assets\@PaulosCreations\RunesAndPortals\Demo\Demo_Controller.cs" />
     <Compile Include="Assets\_Project\Scripts\Player\CartellaClinica.cs" />
+    <Compile Include="Assets\_Project\Scripts\Patient\PatientManager.cs" />
     <Compile Include="Assets\_Project\Scripts\Player\Paziente.cs" />
     <Compile Include="Assets\@PaulosCreations\RunesAndPortals\PortalGate_Simple\Script\Portal_Controller.cs" />
     <Compile Include="Assets\@PaulosCreations\RunesAndPortals\RuneStone\Script\Runestone_Controller.cs" />
