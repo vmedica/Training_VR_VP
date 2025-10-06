@@ -9,6 +9,9 @@ public class LevaPortaleTrigger : MonoBehaviour
     [Header("Script spawn paziente")]
     [SerializeField] private SpawnPaziente spawnPazienteScript;
 
+    [Header("Script collegato a LM Studio")]
+    [SerializeField] private VirtualPatientManager virtualPatientManager;
+
     [Header("Impostazioni leva")]
     [SerializeField] private float sogliaAccensione = 60f;
     [SerializeField] private float sogliaSpegnimento = 80f;
@@ -24,60 +27,55 @@ public class LevaPortaleTrigger : MonoBehaviour
     {
         float angolo = GetAngolo();
 
-        // Leva abbassata: nuovo portale e nuovo paziente
+        // Leva abbassata: crea portale e attiva paziente virtuale
         if (!portaleAttivo && prontoPerRiattivare && angolo <= sogliaAccensione)
         {
-            Debug.Log("[LevaPortaleTrigger] Leva abbassata - creo nuovo portale");
+            Debug.Log("[LevaPortaleTrigger] Leva abbassata - creo portale e paziente virtuale");
 
-            // Distruggi vecchio portale
+            // Distruggi portale precedente
             if (portaleCorrente != null)
-            {
                 Destroy(portaleCorrente);
-                Debug.Log("[LevaPortaleTrigger] Portale precedente distrutto");
-            }
 
-            // Istanzia nuovo portale
+            // Crea nuovo portale
             Vector3 posizioneSpawn = spawnPoint != null ? spawnPoint.position : transform.position + transform.forward * 2f;
             portaleCorrente = Instantiate(portalPrefab, posizioneSpawn, Quaternion.identity);
 
-            // Attiva animazione portale
+            // Attiva portale
             PortalRound_Controller controller = portaleCorrente.GetComponent<PortalRound_Controller>();
             if (controller != null)
-            {
                 controller.F_TogglePortalRound(true);
-            }
 
-            // Spawna paziente
+            // Spawna paziente (grafico)
             if (spawnPazienteScript != null)
-            {
                 spawnPazienteScript.AttivaPortale();
-            }
 
-            // Stato aggiornato
+            // Avvia paziente virtuale (LLM)    
+            Debug.Log($"[LevaPortaleTrigger] - virtualPatientManager = {virtualPatientManager}");
+            if (virtualPatientManager != null)
+            {
+                Debug.Log("[LevaPortaleTrigger] - Chiamo CreaPazienteVirtuale()");
+                virtualPatientManager.CreaPazienteVirtuale();
+
+            }
             portaleAttivo = true;
             prontoPerRiattivare = false;
         }
 
-        // Leva risollevata: preparati a nuovo giro
+        // Leva risollevata
         else if (portaleAttivo && angolo >= sogliaSpegnimento)
         {
             Debug.Log("[LevaPortaleTrigger] Leva risollevata - disattivo portale");
 
-            // Spegni il portale se possibile
             if (portaleCorrente != null)
             {
                 PortalRound_Controller controller = portaleCorrente.GetComponent<PortalRound_Controller>();
                 if (controller != null)
-                {
                     controller.F_TogglePortalRound(false);
-                }
 
-                // Spegni anche le luci (opzionale)
+                // Spegni luci
                 Light[] luci = portaleCorrente.GetComponentsInChildren<Light>();
                 foreach (Light luce in luci)
-                {
                     luce.enabled = false;
-                }
             }
 
             portaleAttivo = false;
@@ -95,7 +93,6 @@ public class LevaPortaleTrigger : MonoBehaviour
             Axis.Z => rot.z,
             _ => 0f
         };
-
         return rawAngle > 180f ? 360f - rawAngle : rawAngle;
     }
 }
