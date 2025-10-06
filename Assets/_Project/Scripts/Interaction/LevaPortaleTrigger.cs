@@ -49,10 +49,14 @@ public class LevaPortaleTrigger : MonoBehaviour
             if (spawnPazienteScript != null)
                 spawnPazienteScript.AttivaPortale();
 
-            // Avvia paziente virtuale (LLM)    //AGGIUNGI UN LOG QUI
+            // Avvia paziente virtuale (LLM)    
+            Debug.Log($"[LevaPortaleTrigger] - virtualPatientManager = {virtualPatientManager}");
             if (virtualPatientManager != null)
+            {
+                Debug.Log("[LevaPortaleTrigger] - Chiamo CreaPazienteVirtuale()");
                 virtualPatientManager.CreaPazienteVirtuale();
 
+            }
             portaleAttivo = true;
             prontoPerRiattivare = false;
         }

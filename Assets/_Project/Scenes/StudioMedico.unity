@@ -8565,7 +8565,7 @@ MonoBehaviour:
   portalPrefab: {fileID: 8722104469372487538, guid: a7eff1b4621ab2648b54410059213e1e, type: 3}
   spawnPoint: {fileID: 1249824450}
   spawnPazienteScript: {fileID: 425654784}
-  virtualPatientManager: {fileID: 0}
+  virtualPatientManager: {fileID: 685572713}
   sogliaAccensione: 60
   sogliaSpegnimento: 80
   asseRotazione: 0

@@ -11,7 +11,7 @@ public class VirtualPatientManager : MonoBehaviour
     [SerializeField] private string datasetPath = "Assets/_Project/Resources/Dataset/Clean_filteredDataset.csv";
 
     [Header("LM Studio API")]
-    [SerializeField] private string lmStudioUrl = "http://127.0.0.1:1234/v1/chat/completions";
+    [SerializeField] private string lmStudioUrl = "http://127.0.0.1:1234/v1/chat/completions";  //completions (Completamento delle chat): Invia una cronologia delle chat al modello per prevedere la prossima risposta dell'assistente
     [SerializeField] private string modelName = "meta-llama-3-8b-instruct";
 
     public async void CreaPazienteVirtuale()
@@ -20,13 +20,13 @@ public class VirtualPatientManager : MonoBehaviour
 
         try
         {
-            // 1️⃣ Estrai tupla casuale dal CSV
+            // Estrai tupla casuale dal CSV
             string patientData = EstraiTuplaCasuale();
 
-            // 2️⃣ Crea prompt completo
+            // Crea prompt completo
             string fullPrompt = CreaPromptCompleto(patientData);
 
-            // 3️⃣ Invia al modello
+            // Invia al modello
             string risposta = await InviaPromptALM(fullPrompt);
 
             Debug.Log($" LLM Studio: {risposta}");
@@ -89,19 +89,64 @@ public class VirtualPatientManager : MonoBehaviour
     {
         using (HttpClient client = new HttpClient())
         {
-            var json = $@"
-{{
-    ""model"": ""{modelName}"",
-    ""messages"": [
-        {{""role"": ""system"", ""content"": ""{prompt.Replace("\"", "\\\"")}""}}
-    ]
-}}";
+            //Messaggio inviato ad LM-Studio
+            
+            var json = @"
+            {
+                ""model"": ""{modelName}"",
+                ""messages"": [
+                    {""role"": ""system"", ""content"": ""Sei un paziente virtuale""},
+                    {""role"": ""user"", ""content"": ""Ciao!""}
+                ]
+            }";
 
+            // Contenuto della request
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await client.PostAsync(lmStudioUrl, content);
 
-            string result = await response.Content.ReadAsStringAsync();
-            return result;
+            try
+            {
+                var response = await client.PostAsync(lmStudioUrl, content);
+
+                string result = await response.Content.ReadAsStringAsync();
+
+                // Debug: log completo della risposta JSON
+                Debug.Log($"JSON completo ricevuto da LM-Studio:\n{result}");
+
+                // Parse semplice per prendere solo il testo della risposta (choices[0].message.content)
+                var jsonObj = JsonUtility.FromJson<ChatCompletionResponse>(result);
+                if (jsonObj.choices != null && jsonObj.choices.Length > 0)
+                {
+                    return jsonObj.choices[0].message.content;
+                }
+
+                return "Nessuna risposta dal modello.";
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Errore durante la richiesta a LM-Studio: " + ex.Message);
+                return null;
+            }
         }
     }
+
+    // Classi per deserializzare il JSON della risposta
+    [Serializable]
+    private class ChatCompletionResponse
+    {
+        public Choice[] choices;
+    }
+
+    [Serializable]
+    private class Choice
+    {
+        public Message message;
+    }
+
+    [Serializable]
+    private class Message
+    {
+        public string role;
+        public string content;
+    }
+
 }
