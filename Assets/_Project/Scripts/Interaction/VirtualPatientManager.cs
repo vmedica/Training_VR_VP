@@ -87,16 +87,42 @@ public class VirtualPatientManager : MonoBehaviour
 
     private async Task<string> InviaPromptALM(string prompt)
     {
+        Debug.Log($"Prompt: {prompt}");
         using (HttpClient client = new HttpClient())
         {
-            //Messaggio inviato ad LM-Studio
-            
+            //Messaggio inviato ad LM-Studio:
+            /*
+                @ indica in C# che è un verbatim string cioè:
+                - Non è necessario fare l'esacpe \
+                - Puoi scrivere su più righe senza \n
+
+                model: model è il campo che LM-Studio si aspetta, indica il modello LLM da usare.
+                messages: messages è un array di messaggi che il modello riceve.
+                    Ogni messaggio ha due campi:
+                    + role -> ruolo del messaggio (system, user, assistant)
+                        - system: istruzioni generali per il modello
+                        - user: messaggi “utente” o prompt
+                        -   assistant: messaggi già generati dal modello (non usato qui)
+                    + content -> il testo vero e proprio del messaggio
+
+            */
+            /*
             var json = @"
             {
                 ""model"": ""{modelName}"",
                 ""messages"": [
                     {""role"": ""system"", ""content"": ""Sei un paziente virtuale""},
-                    {""role"": ""user"", ""content"": ""Ciao!""}
+                    {""role"": ""user"", ""content"": ""Salve""}
+                ]
+            }";
+            */
+            string systemPrompt = "Sei un paziente virtuale in una simulazione medica. Rispondi alle domande come se fossi una persona reale.Devi rispettare questi vincoli: - Usa coerenza con i dati clinici forniti, Mantieni il tono umano e realistico. - Non inventare dati non presenti nella tupla.";
+            var json = @"
+            {
+                ""model"" : ""{modelName}"",
+                ""messages"": [
+                {""role"" : ""system"", ""content"" : ""{systemPrompt}""},
+                {""role"" : ""user"", ""content"" : ""{prompt}""}
                 ]
             }";
 
