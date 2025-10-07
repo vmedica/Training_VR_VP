@@ -14,6 +14,12 @@ public class VirtualPatientManager : MonoBehaviour
     [SerializeField] private string lmStudioUrl = "http://127.0.0.1:1234/v1/chat/completions";  //completions (Completamento delle chat): Invia una cronologia delle chat al modello per prevedere la prossima risposta dell'assistente
     [SerializeField] private string modelName = "meta-llama-3-8b-instruct";
 
+    //Per l'integrazione di SpeechT5:
+    [SerializeField] private AudioSource pazienteAudio;
+    [SerializeField] private SpeechT5Manager ttsManager;
+
+
+
     public async void CreaPazienteVirtuale()
     {
         Debug.Log(" Creazione paziente virtuale in corso...");
@@ -30,6 +36,10 @@ public class VirtualPatientManager : MonoBehaviour
             string risposta = await InviaPromptALM(fullPrompt);
 
             Debug.Log($" LLM Studio: {risposta}");
+
+            // SpeechT5: Sintetizza la risposta del paziente
+            if (!string.IsNullOrEmpty(risposta))
+                StartCoroutine(ttsManager.Speak(risposta, pazienteAudio));
         }
         catch (Exception ex)
         {
