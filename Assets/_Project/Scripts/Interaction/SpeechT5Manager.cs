@@ -7,7 +7,6 @@ public class SpeechT5Manager : MonoBehaviour
 {
     [SerializeField] private string ttsUrl = "http://127.0.0.1:5005/tts";
 
-    // Usa questo per riprodurre la voce
     public IEnumerator Speak(string text, AudioSource audioSource)
     {
         string jsonData = JsonUtility.ToJson(new TextData(text));
@@ -27,7 +26,6 @@ public class SpeechT5Manager : MonoBehaviour
             }
             else
             {
-                // Converti WAV → AudioClip
                 AudioClip clip = WavUtility.ToAudioClip(www.downloadHandler.data, "ttsClip");
                 audioSource.clip = clip;
                 audioSource.Play();

@@ -70,27 +70,29 @@ public class VirtualPatientManager : MonoBehaviour
     private string CreaPromptCompleto(string patientData)
     {
         StringBuilder sb = new StringBuilder();
+        /*
+                sb.AppendLine("SYSTEM PROMPT:");
+                sb.AppendLine("Sei un paziente virtuale all’interno di una simulazione medica.");
+                sb.AppendLine("Il tuo compito è simulare un paziente realistico basato sui seguenti dati clinici.");
+                sb.AppendLine("Rispondi come una persona reale, con coerenza e umanità.");
+                sb.AppendLine();
 
-        sb.AppendLine("SYSTEM PROMPT:");
-        sb.AppendLine("Sei un paziente virtuale all’interno di una simulazione medica.");
-        sb.AppendLine("Il tuo compito è simulare un paziente realistico basato sui seguenti dati clinici.");
-        sb.AppendLine("Rispondi come una persona reale, con coerenza e umanità.");
-        sb.AppendLine();
+                sb.AppendLine(" DATI CLINICI:");
+                sb.AppendLine(patientData);
+                sb.AppendLine();
 
-        sb.AppendLine(" DATI CLINICI:");
-        sb.AppendLine(patientData);
-        sb.AppendLine();
+                sb.AppendLine("ROLE-PLAY:");
+                sb.AppendLine("Comportati come un paziente vero. Rispondi in prima persona come se fossi il paziente.");
+                sb.AppendLine();
 
-        sb.AppendLine("ROLE-PLAY:");
-        sb.AppendLine("Comportati come un paziente vero. Rispondi in prima persona come se fossi il paziente.");
-        sb.AppendLine();
+                sb.AppendLine("ILLNESS SCRIPT:");
+                sb.AppendLine("- Interpreta i dati per rappresentare la tua condizione medica.");
+                sb.AppendLine("- Descrivi sintomi, storia e percezione personale.");
+                sb.AppendLine();
 
-        sb.AppendLine("ILLNESS SCRIPT:");
-        sb.AppendLine("- Interpreta i dati per rappresentare la tua condizione medica.");
-        sb.AppendLine("- Descrivi sintomi, storia e percezione personale.");
-        sb.AppendLine();
-
-        sb.AppendLine("Alla fine di questo messaggio, rispondi con: \"Sono pronto a rispondere alle domande del medico.\"");
+                sb.AppendLine("Alla fine di questo messaggio, rispondi con: \"Sono pronto a rispondere alle domande del medico.\"");
+        */
+        sb.AppendLine("Simula di essere un paziente malato di diabete. Rispondi alla domanda del medico: Buonasera come sati? (Rispondi in lingua italiana)");
 
         return sb.ToString();
     }
