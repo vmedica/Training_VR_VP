@@ -1,19 +1,17 @@
-import torch
-from transformers import SpeechT5Processor, SpeechT5ForTextToSpeech
-import soundfile as sf
+# test_tts_request.py
+import requests
 
-processor = SpeechT5Processor.from_pretrained("microsoft/speecht5_tts")
-model = SpeechT5ForTextToSpeech.from_pretrained("microsoft/speecht5_tts")
+URL = "http://127.0.0.1:5005/tts"
+data = {"text": "Ciao, questo è un test del sintetizzatore vocale SpeechT5. CIAO VINCENZO"}
 
-speaker_embedding = torch.zeros((1, 512))  # voce neutra
-text = "Ciao, sto testando la voce"
+print("Invio testo al server...")
+resp = requests.post(URL, json=data, timeout=60)
 
-inputs = processor(text=text, return_tensors="pt")
-with torch.no_grad():
-    speech = model.generate_speech(inputs["input_ids"], speaker_embedding)
-
-print("Shape output:", speech.shape)  # controlla dimensioni
-speech_np = speech.squeeze().cpu().numpy()
-print("Min/Max:", speech_np.min(), speech_np.max())
-
-sf.write("test.wav", speech_np, 16000)
+if resp.status_code == 200 and resp.headers.get("content-type", "").startswith("audio"):
+    filename = "test_output.wav"
+    with open(filename, "wb") as f:
+        f.write(resp.content)
+    print(f"File '{filename}' salvato. Riproducilo con un player (VLC o Windows Media Player).")
+else:
+    print(f"Errore: {resp.status_code}")
+    print(resp.text)
