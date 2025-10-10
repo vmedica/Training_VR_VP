@@ -35,3 +35,10 @@ Thumbs.db
 *.swp
 *.lock
 *.log
+
+
+# Ignora ambiente virtuale Python
+speecht5_env/
+SpeechServer/speecht5_env/
+__pycache__/
+*.pyc
