@@ -37,8 +37,44 @@ Thumbs.db
 *.log
 
 
-# Ignora ambiente virtuale Python
+# === Python / TTS specific ===
+
+# Ambienti virtuali
+venv/
+env/
+*_env/
+xtts_env/
 speecht5_env/
 SpeechServer/speecht5_env/
+
+# Cache e bytecode
 __pycache__/
 *.pyc
+*.pyo
+
+# Modelli Coqui / TTS scaricati
+XTTS_Local/
+TTS/
+tts_models/
+tts_cache/
+~/.local/share/tts/
+~/.cache/tts/
+**/coqui_tts_models/
+**/TTS/.models.json
+
+# File audio generati
+*.wav
+*.mp3
+*.flac
+
+# File temporanei di test / output
+*.tmp
+output/
+outputs/
+test_outputs/
+
+# File PyTorch e checkpoint
+*.pt
+*.pth
+*.ckpt
+*.onnx
