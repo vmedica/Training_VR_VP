@@ -14,6 +14,23 @@ public class VirtualPatientManager : MonoBehaviour
     [SerializeField] private string lmStudioUrl = "http://127.0.0.1:1234/v1/chat/completions";  //completions (Completamento delle chat): Invia una cronologia delle chat al modello per prevedere la prossima risposta dell'assistente
     [SerializeField] private string modelName = "meta-llama-3-8b-instruct";
 
+    [Header("TTS")]
+    [SerializeField] private TTSClient ttsClient;
+
+    [Serializable]
+    private class MessageToSend
+    {
+        public string role;
+        public string content;
+    }
+
+    [Serializable]
+    private class ChatCompletionRequest
+    {
+        public string model;
+        public MessageToSend[] messages;
+    }
+
     public async void CreaPazienteVirtuale()
     {
         Debug.Log(" Creazione paziente virtuale in corso...");
@@ -30,6 +47,20 @@ public class VirtualPatientManager : MonoBehaviour
             string risposta = await InviaPromptALM(fullPrompt);
 
             Debug.Log($" LLM Studio: {risposta}");
+
+            // Se hai assegnato il TTSClient via Inspector
+            if (ttsClient != null)
+            {
+                await ttsClient.RiproduciVoce(risposta);
+            }
+            else
+            {
+                Debug.LogWarning("TTSClient non assegnato nell'Inspector. Assegna AudioManager -> TTSClient.");
+            }
+
+
+            //PAssa la risposat a XTTS per la sintesi vocale
+            FindObjectOfType<TTSClient>().RiproduciVoce(risposta);
         }
         catch (Exception ex)
         {
@@ -60,96 +91,71 @@ public class VirtualPatientManager : MonoBehaviour
     private string CreaPromptCompleto(string patientData)
     {
         StringBuilder sb = new StringBuilder();
+        /*
+                sb.AppendLine("SYSTEM PROMPT:");
+                sb.AppendLine("Sei un paziente virtuale all’interno di una simulazione medica.");
+                sb.AppendLine("Il tuo compito è simulare un paziente realistico basato sui seguenti dati clinici.");
+                sb.AppendLine("Rispondi come una persona reale, con coerenza e umanità.");
+                sb.AppendLine();
 
-        sb.AppendLine("SYSTEM PROMPT:");
-        sb.AppendLine("Sei un paziente virtuale all’interno di una simulazione medica.");
-        sb.AppendLine("Il tuo compito è simulare un paziente realistico basato sui seguenti dati clinici.");
-        sb.AppendLine("Rispondi come una persona reale, con coerenza e umanità.");
-        sb.AppendLine();
+                sb.AppendLine(" DATI CLINICI:");
+                sb.AppendLine(patientData);
+                sb.AppendLine();
 
-        sb.AppendLine(" DATI CLINICI:");
-        sb.AppendLine(patientData);
-        sb.AppendLine();
+                sb.AppendLine("ROLE-PLAY:");
+                sb.AppendLine("Comportati come un paziente vero. Rispondi in prima persona come se fossi il paziente.");
+                sb.AppendLine();
 
-        sb.AppendLine("ROLE-PLAY:");
-        sb.AppendLine("Comportati come un paziente vero. Rispondi in prima persona come se fossi il paziente.");
-        sb.AppendLine();
+                sb.AppendLine("ILLNESS SCRIPT:");
+                sb.AppendLine("- Interpreta i dati per rappresentare la tua condizione medica.");
+                sb.AppendLine("- Descrivi sintomi, storia e percezione personale.");
+                sb.AppendLine();
 
-        sb.AppendLine("ILLNESS SCRIPT:");
-        sb.AppendLine("- Interpreta i dati per rappresentare la tua condizione medica.");
-        sb.AppendLine("- Descrivi sintomi, storia e percezione personale.");
-        sb.AppendLine();
-
-        sb.AppendLine("Alla fine di questo messaggio, rispondi con: \"Sono pronto a rispondere alle domande del medico.\"");
-
+                sb.AppendLine("Alla fine di questo messaggio, rispondi con: \"Sono pronto a rispondere alle domande del medico.\"");
+        */
+        sb.AppendLine("Ciao, come stai? (Rispondi con una risposta breve)");
         return sb.ToString();
     }
 
     private async Task<string> InviaPromptALM(string prompt)
     {
         Debug.Log($"Prompt: {prompt}");
+
         using (HttpClient client = new HttpClient())
         {
-            //Messaggio inviato ad LM-Studio:
-            /*
-                @ indica in C# che è un verbatim string cioè:
-                - Non è necessario fare l'esacpe \
-                - Puoi scrivere su più righe senza \n
+            string systemPrompt = "Sei un paziente virtuale in una simulazione medica. Rispondi come una persona reale rispettando i dati clinici.";
 
-                model: model è il campo che LM-Studio si aspetta, indica il modello LLM da usare.
-                messages: messages è un array di messaggi che il modello riceve.
-                    Ogni messaggio ha due campi:
-                    + role -> ruolo del messaggio (system, user, assistant)
-                        - system: istruzioni generali per il modello
-                        - user: messaggi “utente” o prompt
-                        -   assistant: messaggi già generati dal modello (non usato qui)
-                    + content -> il testo vero e proprio del messaggio
-
-            */
-            /*
-            var json = @"
+            // Creazione oggetti per il JSON
+            var requestObj = new ChatCompletionRequest
             {
-                ""model"": ""{modelName}"",
-                ""messages"": [
-                    {""role"": ""system"", ""content"": ""Sei un paziente virtuale""},
-                    {""role"": ""user"", ""content"": ""Salve""}
-                ]
-            }";
-            */
-            string systemPrompt = "Sei un paziente virtuale in una simulazione medica. Rispondi alle domande come se fossi una persona reale.Devi rispettare questi vincoli: - Usa coerenza con i dati clinici forniti, Mantieni il tono umano e realistico. - Non inventare dati non presenti nella tupla.";
-            var json = @"
-            {
-                ""model"" : ""{modelName}"",
-                ""messages"": [
-                {""role"" : ""system"", ""content"" : ""{systemPrompt}""},
-                {""role"" : ""user"", ""content"" : ""{prompt}""}
-                ]
-            }";
+                model = modelName,
+                messages = new MessageToSend[]
+                {
+                    new MessageToSend { role = "system", content = systemPrompt },
+                    new MessageToSend { role = "user", content = prompt }
+                }
+            };
 
-            // Contenuto della request
+            string json = JsonUtility.ToJson(requestObj);
+            Debug.Log($"JSON inviato a LM Studio:\n{json}");
+
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             try
             {
                 var response = await client.PostAsync(lmStudioUrl, content);
-
                 string result = await response.Content.ReadAsStringAsync();
+                Debug.Log($"JSON ricevuto da LM Studio:\n{result}");
 
-                // Debug: log completo della risposta JSON
-                Debug.Log($"JSON completo ricevuto da LM-Studio:\n{result}");
-
-                // Parse semplice per prendere solo il testo della risposta (choices[0].message.content)
                 var jsonObj = JsonUtility.FromJson<ChatCompletionResponse>(result);
-                if (jsonObj.choices != null && jsonObj.choices.Length > 0)
-                {
+                if (jsonObj?.choices != null && jsonObj.choices.Length > 0)
                     return jsonObj.choices[0].message.content;
-                }
 
                 return "Nessuna risposta dal modello.";
             }
             catch (Exception ex)
             {
-                Debug.LogError("Errore durante la richiesta a LM-Studio: " + ex.Message);
+                Debug.LogError($"Errore durante la richiesta a LM Studio: {ex.Message}");
                 return null;
             }
         }
